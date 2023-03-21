@@ -6,6 +6,7 @@ import {
   json,
   redirect,
 } from "react-router-dom";
+import { getAuthToken } from "../util/auth";
 
 import classes from "./EventForm.module.css";
 
@@ -85,12 +86,10 @@ function EventForm({ method, event }) {
 
 export default EventForm;
 
-// 1 action chung cho form cho bất kì trang nào cần
+// 1 action chung cho form cho bất kì trang chứa component EventForm  nào cần
 export async function action({ request, params }) {
   const method = request.method;
   const data = await request.formData();
-
-  console.log(method);
 
   const eventData = {
     title: data.get("title"),
@@ -105,9 +104,13 @@ export async function action({ request, params }) {
     url = "http://localhost:8080/events/" + eventId;
   }
 
+  const token = getAuthToken();
   const response = await fetch(url, {
     method: method,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
     body: JSON.stringify(eventData),
   });
 
